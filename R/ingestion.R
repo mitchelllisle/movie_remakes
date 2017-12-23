@@ -36,18 +36,30 @@
   
 # IMDB API Fetch
 library(httr)
+library(tidyverse)
+library(stringr)
+    
+allMovies <- read.csv("data/allMovies.csv")
 
-  cleanMovieTitles <- allMovies %>% 
-  mutate(remakeClean_title = str_extract(remakes_title, "^[^(]+"),
-         remakeClean_title = str_replace_all(remakeClean_title, ".$", "")) %>%
-  mutate(originalClean_title = str_extract(originals_title, "^[^(]+"),
-         originalClean_title = str_replace_all(originalClean_title, ".$", ""))
+cleanMovieTitles <- allMovies %>% 
+mutate(remakeClean_title = str_extract(remakes_title, "^[^(]+"),
+       remakeClean_title = str_replace_all(remakeClean_title, ".$", "")) %>%
+mutate(originalClean_title = str_extract(originals_title, "^[^(]+"),
+       originalClean_title = str_replace_all(originalClean_title, ".$", ""))
   
-for(i in 1:1){
+all_data <- NULL
+
+for(i in 1:nrow(cleanMovieTitles)){
   baseUrl <- "http://www.omdbapi.com/?t="
   key <- "49780c30"
   url <- URLencode(paste0(baseUrl, cleanMovieTitles$remakeClean_title[i], "&y=", cleanMovieTitles$remakes_year[i], "&apikey=", key))
   request <- httr::GET(url)
   
   data <- content(request)
+  
+  current_data <- data.frame(Title = data$Title, year = data$Year, rated = data$Rated, released = data$Released, runtime = data$Runtime, genre = data$Genre, director = data$Director, awards = data$Awards, imdbrating = data$imdbRating, boxOffice = data$BoxOffice)
+  
+  all_data <- rbind(all_data, current_data)
+  cat(cleanMovieTitles$remakeClean_title[i], "\n")
+  cat(round(i/nrow(cleanMovieTitles), 2), "%\n")
 }
