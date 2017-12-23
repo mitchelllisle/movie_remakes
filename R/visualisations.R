@@ -6,9 +6,9 @@ countByYear_chart <- function(data, colours){
     hc_add_series(data = data$rolling_10, type = "line", color = colours[3], name = "10 Year Rolling Average")
 }
 
-tableWithBar <- function(data, colNames, barColour, range){
+tableWithBar <- function(data, colNames, barColour, range, pageLength = 30){
   datatable(data, class = "compact", colnames = colNames,
-            options = list(dom = 't', pageLength = 30)) %>% 
+            options = list(dom = 't', pageLength = pageLength)) %>% 
             formatStyle(names(data),
                         background = styleColorBar(range(range), color = barColour, angle = -90),
                                                                         backgroundSize = '98% 88%',

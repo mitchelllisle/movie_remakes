@@ -54,6 +54,6 @@ What is the most remade movie?
 
 ```{r}
 mostRemakes <- mostRemadeMovies(allMovies)
-tableWithBar(mostRemakes, c("Title of Remake", "# of Remakes"), mostRemakes$count, barColour = '#FFBE52')
+tableWithBar(mostRemakes, c("Title of Remake", "# of Remakes"), mostRemakes$count, barColour = '#FFBE52', pageLength = 10)
 ```
 
