@@ -1,0 +1,40 @@
+---
+title: "Movie Remakes"
+author: "Mitchell Lisle"
+date: "23/12/2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(jsonlite)
+library(tidyverse)
+library(stringr)
+library(highcharter)
+
+source("R/ingestion.R")
+source("R/processing.R")
+source("R/visualisations.R")
+
+originals <- read.csv("data/originals.csv")
+remakes <- read.csv("data/remakes.csv")
+
+knitr::opts_chunk$set(echo = FALSE)
+```
+### Data
+This analysis was made for [this reddit thread](https://www.reddit.com/r/DataVizRequests/comments/7irlb9/request_i_would_like_for_someone_to_visualize/). The data source for this analysis was taken from [Wikipedia](https://en.wikipedia.org/wiki/Lists_of_film_remakes).
+
+
+#### Years that inspired the most remakes.
+The first prt of this analysis was to look at the years that the original movies came out to see which era was the most popular when it comes to remakes. **1939** was the year with the most movies inspiring remakes with **17** movies in total. If you look at the *10 year rolling average (purple line)* you can see that between 1920 and 1940 was the largest period of cinema we have since re-created.
+
+```{r}
+originalsByYear <- countByYear(originals)
+countByYear_chart(originalsByYear, "Years that Inspired the most remakes", c("#4A90E2", "#F4465B","#AD55D0"))
+```
+
+```{r}
+remakesByYear <- countByYear(remakes)
+countByYear_chart(remakesByYear, "Years of the most remakes", c("#FFBE52", "#F4465B", "#AD55D0"))
+
+```
+
