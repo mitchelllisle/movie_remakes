@@ -10,13 +10,15 @@ library(jsonlite)
 library(tidyverse)
 library(stringr)
 library(highcharter)
+library(DT)
 
-source("R/ingestion.R")
 source("R/processing.R")
 source("R/visualisations.R")
 
-originals <- read.csv("data/originals.csv")
-remakes <- read.csv("data/remakes.csv")
+allMovies <- read.csv("data/allMovies.csv")
+originals <- allMovies %>% select(contains("originals")) %>% rename("year" = originals_year)
+remakes <- allMovies %>% select(contains("remakes")) %>% rename("year" = remakes_year)
+
 
 knitr::opts_chunk$set(echo = FALSE)
 ```
@@ -24,17 +26,34 @@ knitr::opts_chunk$set(echo = FALSE)
 This analysis was made for [this reddit thread](https://www.reddit.com/r/DataVizRequests/comments/7irlb9/request_i_would_like_for_someone_to_visualize/). The data source for this analysis was taken from [Wikipedia](https://en.wikipedia.org/wiki/Lists_of_film_remakes).
 
 
-#### Years that inspired the most remakes.
-The first prt of this analysis was to look at the years that the original movies came out to see which era was the most popular when it comes to remakes. **1939** was the year with the most movies inspiring remakes with **17** movies in total. If you look at the *10 year rolling average (purple line)* you can see that between 1920 and 1940 was the largest period of cinema we have since re-created.
+### Years that inspired the most remakes.
+The first prt of this analysis was to look at the years that the original movies came out to see which era was the most popular when it comes to remakes. **1939** and **1932** was the year with the most movies inspiring remakes with **22** movies in total. If you look at the *10 year rolling average (purple line)* you can see that between 1920 and 1940 was the largest period of cinema we have since re-created.
 
 ```{r}
 originalsByYear <- countByYear(originals)
-countByYear_chart(originalsByYear, "Years that Inspired the most remakes", c("#4A90E2", "#F4465B","#AD55D0"))
+countByYear_chart(originalsByYear, c("#4A90E2", "#F4465B","#AD55D0"))
 ```
 
+
+### Years of the most remakes
 ```{r}
 remakesByYear <- countByYear(remakes)
-countByYear_chart(remakesByYear, "Years of the most remakes", c("#FFBE52", "#F4465B", "#AD55D0"))
+countByYear_chart(remakesByYear, c("#FFBE52", "#F4465B", "#AD55D0"))
 
+```
+
+### Too Soon? Years between remakes and originals
+How long do filmmakers wait until they remake a movie? Well, looking at the data the averge years between an original movie and a remake is `r round(mean(allMovies$yearsBetween),2)`
+```{r}
+tooSoon <- allMovies %>% select(remakes_title, yearsBetween) %>% arrange(desc(yearsBetween))
+tableWithBar(tooSoon, c("Title of Remake", "# of Years after Original"), tooSoon$yearsBetween, barColour = '#4A90E2')
+```
+
+### Again and Again and Again.....
+What is the most remade movie?
+
+```{r}
+mostRemakes <- mostRemadeMovies(allMovies)
+tableWithBar(mostRemakes, c("Title of Remake", "# of Remakes"), mostRemakes$count, barColour = '#FFBE52')
 ```
 

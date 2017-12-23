@@ -8,3 +8,12 @@ countByYear <- function(data){
   
   return(data)
 }
+
+mostRemadeMovies <- function(data){
+  data <- data %>%
+    group_by(originals_title) %>%
+    summarise(count = n()) %>%
+    arrange(desc(count))
+  
+  return(data)
+}
