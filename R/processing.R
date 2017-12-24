@@ -17,3 +17,13 @@ mostRemadeMovies <- function(data){
   
   return(data)
 }
+
+mostPopularRemakes <- function(data, movieMetaData){
+  remakes <- rename(remakes, "key" = remakes_key)
+  joinData <- remakes %>% left_join(movieMetaData, by = 'key')
+  joinData %>% filter(!is.na(Title)) %>%
+    select(Title, imdbrating, released) %>%
+    mutate(imdbrating = as.numeric(imdbrating)) %>%
+    filter(!is.na(imdbrating)) %>%
+    arrange(desc(imdbrating))
+}

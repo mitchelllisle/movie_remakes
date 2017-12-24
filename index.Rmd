@@ -15,10 +15,10 @@ library(DT)
 source("R/processing.R")
 source("R/visualisations.R")
 
-allMovies <- read.csv("data/allMovies.csv")
+allMovies <- read.csv("data/allMovies_new.csv", stringsAsFactors = FALSE)
+movieMetaData <- read.csv("data/movieData.csv", stringsAsFactors = FALSE)
 originals <- allMovies %>% select(contains("originals")) %>% rename("year" = originals_year)
 remakes <- allMovies %>% select(contains("remakes")) %>% rename("year" = remakes_year)
-
 
 knitr::opts_chunk$set(echo = FALSE)
 ```
@@ -58,5 +58,14 @@ What is the most remade movie?
 ```{r}
 mostRemakes <- mostRemadeMovies(allMovies)
 tableWithBar(mostRemakes, c("Title of Remake", "# of Remakes"), mostRemakes$count, barColour = '#FFBE52', pageLength = 10)
+```
+
+```{r}
+mostPopularRemakes_data <- mostPopularRemakes(remakes, movieMetaData)
+```
+### Most Popular Remakes
+Which remakes were the most popular? There are a number of movies that donn't hace ratings on IMDB, but looking at the ones that do, `r mostPopularRemakes_data[1,]$Title` is the most popular remake with a rating of `r mostPopularRemakes_data[1,]$imdbrating`
+```{r warning=FALSE}
+tableWithBar(data = mostPopularRemakes_data, colNames = c("Movie", "IMDB Rating", "Released"), range = mostPopularRemakes_data$imdbrating, pageLength = 20, barColour = '#F4465B')
 ```
 

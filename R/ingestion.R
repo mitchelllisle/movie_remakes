@@ -3,6 +3,7 @@
   library(stringr)
   
   data <- data.frame(read_json("data/movie_originals_remakes.json")$data)
+  data <- read.csv("data/movieData.csv")
   data <- gather(data) %>% mutate(key = row_number(), 
                                   oddOrEven = if_else(key %% 2 == 0, "even", "odd"),
                                   year = str_extract(value, "\\([0-9]*?\\)"),
@@ -39,16 +40,11 @@ library(httr)
 library(tidyverse)
 library(stringr)
     
-allMovies <- read.csv("data/allMovies.csv")
+cleanMovieTitles <- data %>% 
+mutate(title = str_extract(value, "^[^(]+"),
+       title = str_replace_all(value, ".$", ""))
 
-cleanMovieTitles <- allMovies %>% 
-mutate(remakeClean_title = str_extract(remakes_title, "^[^(]+"),
-       remakeClean_title = str_replace_all(remakeClean_title, ".$", "")) %>%
-mutate(originalClean_title = str_extract(originals_title, "^[^(]+"),
-       originalClean_title = str_replace_all(originalClean_title, ".$", ""))
-  
-all_data <- NULL
-
+all_remake_data <- NULL
 for(i in 1:nrow(cleanMovieTitles)){
   baseUrl <- "http://www.omdbapi.com/?t="
   key <- "49780c30"
@@ -57,9 +53,30 @@ for(i in 1:nrow(cleanMovieTitles)){
   
   data <- content(request)
   
-  current_data <- data.frame(Title = data$Title, year = data$Year, rated = data$Rated, released = data$Released, runtime = data$Runtime, genre = data$Genre, director = data$Director, awards = data$Awards, imdbrating = data$imdbRating, boxOffice = data$BoxOffice)
+  current_data <- list(Title = data$Title, year = data$Year, rated = data$Rated, released = data$Released, runtime = data$Runtime, genre = data$Genre, director = data$Director, awards = data$Awards, imdbrating = data$imdbRating, boxOffice = data$BoxOffice)
+  
+  current_data <- data.frame(nullToNAString(current_data))
   
   all_data <- rbind(all_data, current_data)
-  cat(cleanMovieTitles$remakeClean_title[i], "\n")
-  cat(round(i/nrow(cleanMovieTitles), 2), "%\n")
+  cat(cleanMovieTitles$remakeClean_title[i], " ")
+  cat(paste0(round(i/nrow(cleanMovieTitles)*100, 2), "%\n"))
+}
+
+cleanOriginal <- cleanMovieTitles %>% select(originalClean_title, originals_year) %>% distinct()  
+all_original_data <- NULL
+for(i in 1:nrow(cleanOriginal)){
+  baseUrl <- "http://www.omdbapi.com/?t="
+  key <- "49780c30"
+  url <- URLencode(paste0(baseUrl, cleanOriginal$originalClean_title[i], "&y=", cleanOriginal$originals_year[i], "&apikey=", key))
+  request <- httr::GET(url)
+  
+  data <- content(request)
+  
+  current_data <- list(Title = data$Title, year = data$Year, rated = data$Rated, released = data$Released, runtime = data$Runtime, genre = data$Genre, director = data$Director, awards = data$Awards, imdbrating = data$imdbRating, boxOffice = data$BoxOffice)
+  
+  current_data <- data.frame(nullToNAString(current_data))
+  
+  all_data <- rbind(all_data, current_data)
+  cat(cleanMovieTitles$remakeClean_title[i], " ")
+  cat(paste0(round(i/nrow(cleanMovieTitles)*100, 2), "%\n"))
 }
