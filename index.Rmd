@@ -31,19 +31,19 @@ The original question this analysis was endeavouring to answer was, 'How have re
 
 As you can see from the chart below, there has been quite a ramp up in the number of movies that are remakes. We see an average of between ~5 to ~7 in the years from 1904 to around 1980. From 1980 things really start ramping up and we seek a peak of **28 movies** in 2005 being classed as remakes. Interestingly, in more recent years there has been a decline the number of remakes and a return to a more modest average of between ~6 to ~7. Perhaps the remake bubble is over? Maybe remakes started off performing well at the box office but now people are looking for more original content? Or perhaps we have oversatured previous decades original movies and there are little to no remakes left? Further analysis will help to answer these questions.
 
-\pagebreak
+
+
 ```{r}
 remakesByYear <- countByYear(remakes)
-countByYear_chart(remakesByYear, c("#FFBE52", "#F4465B", "#AD55D0"))
-
+countByYear_chart(remakesByYear, c("#CFCFCF", "#AD55D0", "#F4465B"), "<b>UPWARD TREND IN RECENT YEARS OF MOVIE REMAKES</b>")
 ```
 
 ### Years that inspired the most remakes.
-But when were the originals made? **1939** and **1932** was the year with the most movies inspiring remakes with **22** movies in total. If you look at the *10 year rolling average (purple line)* you can see that between 1920 and 1940 was the largest period of cinema we have since re-created.
+But when were the originals made? **1939** and **1932** was the year with the most movies inspiring remakes with **22** movies in total. If you look at the *5 year rolling average* you can see that the 1930s was the most popular period of cinema we have looked to re-create.
 
 ```{r}
 originalsByYear <- countByYear(originals)
-countByYear_chart(originalsByYear, c("#4A90E2", "#F4465B","#AD55D0"))
+countByYear_chart(originalsByYear, c("#CFCFCF", "#4A90E2","#4A90E2"), "<b>DOWNWARD TREND IN MOVIES BEING REMADE</b>")
 ```
 
 ### Too Soon? Years between remakes and originals
