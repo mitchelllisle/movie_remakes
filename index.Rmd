@@ -16,7 +16,7 @@ source("R/processing.R")
 source("R/visualisations.R")
 
 allMovies <- read.csv("data/allMovies.csv", stringsAsFactors = FALSE)
-movieMetaData <- read.csv("data/movieMetaData.csv", stringsAsFactors = FALSE)
+movieMetaData <- data.table::fread("data/movieMetaData.csv", stringsAsFactors = FALSE)
 
 originals <- allMovies %>% select(contains("originals")) %>% rename("year" = originals_year)
 remakes <- allMovies %>% select(contains("remakes")) %>% rename("year" = remakes_year)
@@ -35,7 +35,7 @@ As you can see from the chart below, there has been quite a ramp up in the numbe
 
 ```{r}
 remakesByYear <- countByYear(remakes)
-countByYear_chart(remakesByYear, c("#CFCFCF", "#AD55D0", "#F4465B"), "<b>UPWARD TREND IN RECENT YEARS OF MOVIE REMAKES</b>")
+countByYear_chart(remakesByYear, c("#CFCFCF", "#AD55D0", "#F4465B"), "Upward Trend in Recent Years for Remakes", "The number of movie remake releases by year", "source: List of Film Remakes (Wikipedia)", "https://en.wikipedia.org/wiki/List_of_film_remakes_(A%E2%80%93M)")
 ```
 
 ### Years that inspired the most remakes.
@@ -43,18 +43,55 @@ But when were the originals made? **1939** and **1932** was the year with the mo
 
 ```{r}
 originalsByYear <- countByYear(originals)
-countByYear_chart(originalsByYear, c("#CFCFCF", "#4A90E2","#4A90E2"), "<b>DOWNWARD TREND IN MOVIES BEING REMADE</b>")
+countByYear_chart(originalsByYear, c("#CFCFCF", "#4A90E2","#4A90E2"), "Downward trend in movies being remade", "The number of original movies released by year with atleast one remake", "source: List of Film Remakes (Wikipedia)", "https://en.wikipedia.org/wiki/List_of_film_remakes_(A%E2%80%93M)")
 ```
 
 ### Too Soon? Years between remakes and originals
 How long do filmmakers wait until they remake a movie? Well, looking at the data the averge years between an original movie and a remake is `r round(mean(allMovies$yearsBetween),2)`
 ```{r}
-tooSoon <- allMovies %>% select(remakes_title, yearsBetween) %>% arrange(desc(yearsBetween))
-tableWithBar(tooSoon, c("Title of Remake", "# of Years after Original"), tooSoon$yearsBetween, barColour = '#4A90E2')
+tooSoon <- allMovies %>% select(remakes_title, remakes_yearsBetween) %>% arrange(desc(remakes_yearsBetween))
+tableWithBar(tooSoon, c("Title of Remake", "# of Years after Original"), tooSoon$remakes_yearsBetween, barColour = '#4A90E2')
 ```
 
 ### Again and Again and Again.....
 What is the most remade movie?
+
+```{r}
+robinHoodData <- allMovies %>%
+  distinct() %>%
+  filter(originals_key == "Robin Hood (1922)") %>%
+  left_join(movieMetaData, by = c("remakes_key" = "key")) %>%
+  select(originals_key, remakes_key, remakes_year, imdbrating) %>%
+  arrange(remakes_year)
+
+colours <- c("#FBB2BB", "#FF96A3", "#FF6073", "#FF1F3A", "#B90016")
+popularRemakes_chart(robinHoodData, colours, "#2. Robin Hood", paste("IMDB Rating for the", nrow(robinHoodData), "remakes of", robinHoodData$originals_key[1]), source = "IMDB", link = "http://www.imdb.com/")
+
+```
+
+```{r}
+scroogeData <- allMovies %>%
+  distinct() %>%
+  filter(originals_key == "Scrooge (1935)") %>%
+  left_join(movieMetaData, by = c("remakes_key" = "key")) %>%
+  select(originals_key, remakes_key, remakes_year, imdbrating) %>%
+  arrange(remakes_year)
+
+colours <- c("#FFD4C3", "#FFA886", "#FF834F", "#EB6431", "#AB4A24", "#7C2706")
+popularRemakes_chart(scroogeData, colours, "#1. Scrooge", paste("IMDB Rating for the ", nrow(scroogeData), "remakes of", scroogeData$originals_key[1]), source = "IMDB", link = "http://www.imdb.com/")
+```
+
+```{r}
+musketeersData <- allMovies %>%
+  distinct() %>%
+  filter(originals_key == "The Three Musketeers (1921)") %>%
+  left_join(movieMetaData, by = c("remakes_key" = "key")) %>%
+  select(originals_key, remakes_key, remakes_year, imdbrating) %>%
+  arrange(remakes_year)
+
+colours <- c("#C5E0FF", "#A3CDFF", "#77B6FF", "#4A90E2", "#024EA6")
+popularRemakes_chart(musketeersData, colours, "#3. The Three Musketeers", paste("IMDB Rating for the", nrow(musketeersData), "remakes of", musketeersData$originals_key[1]), source = "IMDB", link = "http://www.imdb.com/")
+```
 
 ```{r}
 mostRemakes <- mostRemadeMovies(allMovies)
@@ -70,7 +107,16 @@ Which remakes were the most popular? There are a number of movies that don't hav
 tableWithBar(data = mostPopularRemakes_data, colNames = c("Movie", "Released", "IMDB Rating"), range = mostPopularRemakes_data$imdbrating, pageLength = 20, barColour = '#F4465B')
 ```
 
+### Genre
 ```{r}
+genreData <- movieMetaData %>%
+  select(genre) %>%
+  separate(genre, into = c('primaryGenre', 'secondaryGenre'), extra = 'drop', sep = ",") %>%
+  group_by(primaryGenre) %>%
+  summarise(count = n()) %>%
+  mutate(percentage = count/sum(count)*100) %>%
+  arrange(desc(count))
 
+barChart(genreData)
 ```
 
