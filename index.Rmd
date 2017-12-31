@@ -110,13 +110,14 @@ tableWithBar(data = mostPopularRemakes_data, colNames = c("Movie", "Released", "
 ### Genre
 ```{r}
 genreData <- movieMetaData %>%
-  select(genre) %>%
+  select(genre, imdbrating) %>%
   separate(genre, into = c('primaryGenre', 'secondaryGenre'), extra = 'drop', sep = ",") %>%
   group_by(primaryGenre) %>%
+  mutate(averageRating = mean(imdbrating))
   summarise(count = n()) %>%
   mutate(percentage = count/sum(count)*100) %>%
   arrange(desc(count))
 
-barChart(genreData)
+sbarChart(genreData)
 ```
 
