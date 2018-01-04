@@ -1,35 +1,50 @@
-@import url('https://fonts.googleapis.com/css?family=Lora|Open+Sans+Prata');
+@import url('https://fonts.googleapis.com/css?family=Lora|Open+Sans+Prata+Lobster');
 
 body, html {
   margin: 0;
-  font-family: 'Roboto', sans-serif;
+  font-family: 'Open Sans', sans-serif;
+  height: 100%;
+}
+
+a {
+  text-decoration: underline;
+  color: black;
+  font-weight: bold;
 }
 
 #header {
-  background-color: #EE1C24;
+  background-image: url("bladeRunner.png");
+  background-repeat: no-repeat;
+  background-size: cover;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
   color: white;
   height: 80%;
-  margin: 0 auto;
   width: 100%;
   text-align: center;
   /* border: 1px solid blue; */
 }
 
 #header #hero {
-  position: relative;
-  float: left;
+  width: 30%;
+  min-width: 700px;
+  position: absolute;
   top: 40%;
   left: 50%;
-  transform: translate(-50%, -50%);
-  width: 800px;
-  height: 30%;
+  -moz-transform: translateX(-50%) translateY(-50%);
+  -webkit-transform: translateX(-50%) translateY(-50%);
+  transform: translateX(-50%) translateY(-50%);
 }
 
 #footnotes {
+  padding-top: 5%;
   font-size: 13px;
   color: gray;
   font-family: Prata;
 }
+
+
 
 .logo img{
   margin-top: 30px;
@@ -44,8 +59,17 @@ body, html {
 p, h1, h2, h3, h4, h5, #footnotes {
   padding-left: 50;
   padding-right: 50;
-  line-height: 1.8;
+  line-height: 1.5;
 }
+
+.singleChart {
+  min-height: 500px;
+}
+
+.multiChart {
+  min-height: 100px;
+}
+
 
 h1 {
   font-family: Prata;
